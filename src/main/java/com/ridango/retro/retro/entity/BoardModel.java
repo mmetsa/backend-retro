@@ -13,13 +13,14 @@ import java.util.List;
 public class BoardModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     private String teamName;
     private Date expirationDate;
     private boolean isActive = true;
+    private Date retroDate;
 
     @OneToMany(mappedBy = "boardModel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardColumnModel> columns;

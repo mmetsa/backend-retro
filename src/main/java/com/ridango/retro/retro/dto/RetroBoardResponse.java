@@ -13,6 +13,7 @@ public class RetroBoardResponse {
     private String teamName;
     private LocalDate expirationDate;
     private boolean isActive;
+    private LocalDate retroDate;
     private List<BoardColumnResponse> columns;
 
 

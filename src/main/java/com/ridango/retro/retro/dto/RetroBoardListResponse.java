@@ -2,14 +2,14 @@ package com.ridango.retro.retro.dto;
 
 import lombok.Data;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
-public class RetroBoardRequest {
+public class RetroBoardListResponse {
 
+    private Long id;
     private String name;
     private String teamName;
-
-    private List<String> columns;
+    private LocalDate retroDate;
 
 }

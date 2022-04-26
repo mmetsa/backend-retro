@@ -1,18 +1,21 @@
 package com.ridango.retro.retro.service;
 
 import com.ridango.retro.retro.dto.BoardColumnItemRequest;
+import com.ridango.retro.retro.dto.RetroBoardListResponse;
 import com.ridango.retro.retro.dto.RetroBoardRequest;
 import com.ridango.retro.retro.dto.RetroBoardResponse;
 import com.ridango.retro.retro.entity.BoardColumnModel;
 import com.ridango.retro.retro.entity.BoardItemModel;
 import com.ridango.retro.retro.entity.BoardModel;
 import com.ridango.retro.retro.mapper.RetroBoardMapper;
+import com.ridango.retro.retro.repository.BoardItemRepository;
 import com.ridango.retro.retro.repository.RetroBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +24,18 @@ import java.util.List;
 public class RetroBoardService {
 
     private final RetroBoardRepository repository;
+    private final BoardItemRepository boardItemRepository;
 
     public RetroBoardResponse getRetroBoard(Long id) {
-        return RetroBoardMapper.INSTANCE.toResponse(
+        var response = RetroBoardMapper.INSTANCE.toResponse(
                 repository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "BOARD_NOT_FOUND")));
+        response.setActive(!response.getRetroDate().plusDays(2).isBefore(LocalDate.now()));
+        return response;
+    }
+
+    public List<RetroBoardListResponse> getBoardList() {
+        return RetroBoardMapper.INSTANCE.toListResponse(repository.findAll());
     }
 
     public Long createRetroBoard(RetroBoardRequest request) {
@@ -52,6 +62,30 @@ public class RetroBoardService {
             column.setItems(new ArrayList<>(List.of(item)));
         }
         repository.save(column);
+    }
+
+    public void removeItemFromBoardColumn(Long id) {
+        boardItemRepository.deleteById(id);
+    }
+
+    public void addUpvoteToItem(Long itemId) {
+        BoardItemModel model = boardItemRepository.getById(itemId);
+        if (model.getUpVotes() == null) {
+            model.setUpVotes(1);
+        } else {
+            model.setUpVotes(model.getUpVotes() + 1);
+        }
+        boardItemRepository.save(model);
+    }
+
+    public void addDownvoteToItem(Long itemId) {
+        BoardItemModel model = boardItemRepository.getById(itemId);
+        if (model.getDownVotes() == null) {
+            model.setDownVotes(1);
+        } else {
+            model.setDownVotes(model.getDownVotes() + 1);
+        }
+        boardItemRepository.save(model);
     }
 
 }
